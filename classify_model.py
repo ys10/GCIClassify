@@ -25,5 +25,6 @@ class ClassifyModel(object):
             acc, acc_op = tf.metrics.accuracy(labels, predictions)
             rec, rec_op = tf.metrics.recall(labels, predictions)
             pre, pre_op = tf.metrics.precision(labels, predictions)
+            f1_score = tf.divide(2 * tf.multiply(rec_op, pre_op), tf.add(rec_op, pre_op))
             return {"predictions": predictions, "labels": labels, "loss": loss,
-                    "accuracy": acc_op, "recall": rec_op, "precision": pre_op}
+                    "accuracy": acc_op, "recall": rec_op, "precision": pre_op, "f1_score": f1_score}

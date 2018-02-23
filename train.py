@@ -21,7 +21,7 @@ def get_args():
 
 
 def main():
-    tf.logging.set_verbosity(tf.logging.INFO)
+    tf.logging.set_verbosity(tf.logging.WARN)
     args = get_args()
     net = ClassifyModel()
     graph = tf.Graph()
@@ -41,6 +41,7 @@ def main():
             accuracy_summary = tf.summary.scalar("accuracy", tensor_dict["accuracy"])
             recall_summary = tf.summary.scalar("recall", tensor_dict["recall"])
             precision_summary = tf.summary.scalar("precision", tensor_dict["precision"])
+            f1_score_summary = tf.summary.scalar("f1_score", tensor_dict["f1_score"])
             global_step = tf.Variable(0, dtype=tf.int32, name="global_step")
             opt = tf.train.AdamOptimizer(1e-3)
             upd = opt.minimize(tensor_dict["loss"], global_step=global_step)
@@ -62,13 +63,16 @@ def main():
         pbar.update(global_step_eval)
         sess.run(training_init_op)
         while global_step_eval < training_steps:
-            training_list = [loss_summary, accuracy_summary, recall_summary, precision_summary, global_step, upd]
+            training_list = [loss_summary, accuracy_summary, recall_summary, precision_summary,
+                             f1_score_summary, global_step, upd]
             training_loss_summary_eval, training_accuracy_summary_eval, training_recall_summary_eval,\
-                training_precision_summary_eval, global_step_eval, _ = sess.run(training_list)
+                training_precision_summary_eval, training_f1_score_summary_eval, global_step_eval,\
+                _ = sess.run(training_list)
             training_writer.add_summary(training_loss_summary_eval, global_step=global_step_eval)
             training_writer.add_summary(training_accuracy_summary_eval, global_step=global_step_eval)
             training_writer.add_summary(training_recall_summary_eval, global_step=global_step_eval)
             training_writer.add_summary(training_precision_summary_eval, global_step=global_step_eval)
+            training_writer.add_summary(training_f1_score_summary_eval, global_step=global_step_eval)
             """save model"""
             if global_step_eval % save_steps == 0:
                 if not os.path.exists(args.save_path) or not os.path.isdir(args.save_path):
@@ -77,13 +81,14 @@ def main():
             """validation"""
             if global_step_eval % validation_steps == 0:
                 sess.run(validation_init_op)
-                validation_list = [loss_summary, accuracy_summary, recall_summary, precision_summary]
+                validation_list = [loss_summary, accuracy_summary, recall_summary, precision_summary, f1_score_summary]
                 validation_loss_summary_eval, validation_accuracy_summary_eval, validation_recall_summary_eval,\
-                    validation_precision_summary_eval = sess.run(validation_list)
+                    validation_precision_summary_eval, validation_f1_score_summary_eval = sess.run(validation_list)
                 validation_writer.add_summary(validation_loss_summary_eval, global_step=global_step_eval)
                 validation_writer.add_summary(validation_accuracy_summary_eval, global_step=global_step_eval)
                 validation_writer.add_summary(validation_recall_summary_eval, global_step=global_step_eval)
                 validation_writer.add_summary(validation_precision_summary_eval, global_step=global_step_eval)
+                validation_writer.add_summary(validation_f1_score_summary_eval, global_step=global_step_eval)
                 tf.logging.info("Validation done.")
                 sess.run(training_init_op)
             pbar.update(1)

@@ -69,8 +69,9 @@ def main():
         total_accuracy /= global_step_eval
         total_recall /= global_step_eval
         total_precision /= global_step_eval
-        tf.logging.info("Average loss: {:.6f}, accuracy: {:.6f}, recall: {:.6f}, precision: {:.6f}, "
-                        .format(total_loss, total_accuracy, total_recall, total_precision))
+        total_f1_score = 2 * total_recall * total_precision / (total_recall + total_precision)
+        tf.logging.info("Average loss: {:.6f}, accuracy: {:.6f}, recall: {:.6f}, precision: {:.6f}, f1_score: {:.6f}"
+                        .format(total_loss, total_accuracy, total_recall, total_precision, total_f1_score))
     tf.logging.info("Congratulations!")
 
 
