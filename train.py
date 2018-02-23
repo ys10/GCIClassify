@@ -13,7 +13,7 @@ def get_args():
     parser = argparse.ArgumentParser(description="DiscriminateNetwork")
     parser.add_argument("--save_path", type=str, default="./save/")
     parser.add_argument("--log_path", type=str, default="./log/")
-    parser.add_argument("--training_epochs", type=int, default=400)
+    parser.add_argument("--training_epochs", type=int, default=600)
     parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--save_per_epochs", type=int, default=10)
     parser.add_argument("--validation_per_epochs", type=int, default=1)
@@ -45,13 +45,15 @@ def main():
             global_step = tf.Variable(0, dtype=tf.int32, name="global_step")
             opt = tf.train.AdamOptimizer(1e-3)
             upd = opt.minimize(tensor_dict["loss"], global_step=global_step)
-            saver = tf.train.Saver()
+            saver = tf.train.Saver(max_to_keep=50)
 
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
     with tf.Session(graph=graph, config=config) as sess:
+        sess.run([tf.global_variables_initializer(), tf.local_variables_initializer()])
         save_path = os.path.join(args.save_path, net.name)
         if not load_model(saver, sess, save_path):
+            tf.logging.info("Run on an initialized graph.")
             sess.run([tf.global_variables_initializer(), tf.local_variables_initializer()])
         training_writer = tf.summary.FileWriter(os.path.join(args.log_path, "training"), sess.graph)
         validation_writer = tf.summary.FileWriter(os.path.join(args.log_path, "validation"), sess.graph)
