@@ -8,17 +8,17 @@ class ClassifyModel(object):
         self.input_size = input_size
         self.label_classes = label_classes
 
-    def build(self, data, reuse=None):
+    def build(self, data, reuse=None, training=False):
         with tf.variable_scope(self.name, reuse=reuse):
             features = tf.cast(data["features"], tf.float32)
             labels = tf.cast(data["labels"], tf.int32)
-            output = tf.layers.batch_normalization(features, name="bn_layer_0")
+            output = tf.layers.batch_normalization(features, training=training, name="bn_layer_0")
             output = tf.layers.dense(inputs=output, units=16, activation=tf.nn.relu, name="hidden_layer_1")
-            output = tf.layers.batch_normalization(output, name="bn_layer_1")
+            output = tf.layers.batch_normalization(output, training=training, name="bn_layer_1")
             output = tf.layers.dense(inputs=output, units=8, activation=tf.nn.relu, name="hidden_layer_2")
-            output = tf.layers.batch_normalization(output, name="bn_layer_2")
+            output = tf.layers.batch_normalization(output, training=training, name="bn_layer_2")
             output = tf.layers.dense(inputs=output, units=4, activation=tf.nn.relu, name="hidden_layer_3")
-            output = tf.layers.batch_normalization(output, name="bn_layer_3")
+            output = tf.layers.batch_normalization(output, training=training, name="bn_layer_3")
             logits = tf.layers.dense(inputs=output, units=2, activation=tf.nn.softmax, name="output_layer")
             predictions = tf.argmax(logits, axis=-1)
             loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
