@@ -12,10 +12,10 @@ from model_loader import load_model
 def get_args():
     parser = argparse.ArgumentParser(description="DiscriminateNetwork")
     parser.add_argument("--save_path", type=str, default="./save/")
-    parser.add_argument("--testing_set_name", type=str, default="cmu/ked")
+    parser.add_argument("--testing_set_name", type=str, default="cmu/bdl")
     parser.add_argument("--log_path", type=str, default="./log/")
     parser.add_argument("--testing_epochs", type=int, default=1)
-    parser.add_argument("--batch_size", type=int, default=64)
+    parser.add_argument("--batch_size", type=int, default=128)
     return parser.parse_args()
 
 

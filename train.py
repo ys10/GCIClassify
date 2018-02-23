@@ -21,7 +21,7 @@ def get_args():
 
 
 def main():
-    tf.logging.set_verbosity(tf.logging.WARN)
+    tf.logging.set_verbosity(tf.logging.INFO)
     args = get_args()
     net = ClassifyModel()
     graph = tf.Graph()
@@ -44,7 +44,9 @@ def main():
             f1_score_summary = tf.summary.scalar("f1_score", tensor_dict["f1_score"])
             global_step = tf.Variable(0, dtype=tf.int32, name="global_step")
             opt = tf.train.AdamOptimizer(1e-3)
-            upd = opt.minimize(tensor_dict["loss"], global_step=global_step)
+            extra_update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+            with tf.control_dependencies(extra_update_ops):
+                upd = opt.minimize(tensor_dict["loss"], global_step=global_step)
             saver = tf.train.Saver(max_to_keep=50)
 
     config = tf.ConfigProto()
