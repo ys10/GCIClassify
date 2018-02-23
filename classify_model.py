@@ -12,10 +12,13 @@ class ClassifyModel(object):
         with tf.variable_scope(self.name, reuse=reuse):
             features = tf.cast(data["features"], tf.float32)
             labels = tf.cast(data["labels"], tf.int32)
-            # labels = tf.one_hot(data["labels"], depth=self.label_classes, dtype=tf.float32)
             output = tf.layers.dense(inputs=features, units=16, activation=tf.nn.relu, name="hidden_layer_1")
             output = tf.layers.dense(inputs=output, units=8, activation=tf.nn.relu, name="hidden_layer_2")
             logits = tf.layers.dense(inputs=output, units=2, activation=tf.nn.softmax, name="output_layer")
-            modes = tf.argmax(logits, axis=-1)
+            predictions = tf.argmax(logits, axis=-1)
             loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
-            return {"output": modes, "labels": labels, "loss": loss}
+            acc, acc_op = tf.metrics.accuracy(labels, predictions)
+            rec, rec_op = tf.metrics.recall(labels, predictions)
+            pre, pre_op = tf.metrics.precision(labels, predictions)
+            return {"predictions": predictions, "labels": labels, "loss": loss,
+                    "accuracy": acc_op, "recall": rec_op, "precision": pre_op}
