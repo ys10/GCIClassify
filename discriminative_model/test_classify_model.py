@@ -1,12 +1,13 @@
 # coding=utf-8
-import os
-import tqdm
 import argparse
-import tensorflow as tf
+import os
 
-from data_set import get_testing_set
-from classify_model import ClassifyModel
-from model_loader import load_model
+import tensorflow as tf
+import tqdm
+
+from discriminative_model.classify_model import ClassifyModel
+from discriminative_model.data_set import get_testing_set
+from discriminative_model.model_loader import load_model
 
 
 def get_args():
