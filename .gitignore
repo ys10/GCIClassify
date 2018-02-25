@@ -102,3 +102,4 @@ ENV/
 .idea/*
 log/*
 save/*
+test.py
