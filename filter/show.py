@@ -1,0 +1,52 @@
+# coding=utf-8
+import os
+import wave
+import numpy as np
+from matplotlib import pyplot as plt
+
+from filter.low_pass_filter import butter_low_pass_filter
+
+wave_dir = "data/origin/cmu/APLAWDW/wav/"
+wave_name = "aw01a0.wav"
+wave_path = os.path.join(wave_dir, wave_name)
+
+mark_dir = "data/origin/cmu/APLAWDW/marks/"
+mark_name = "aw01a0.marks"
+mark_path = os.path.join(mark_dir, mark_name)
+
+with open(mark_path, "r") as marks_file:
+    marks = list()
+    while 1:
+        lines = marks_file.readlines(1000)
+        if not lines:
+            break
+        for line in lines:
+            marks.append(float(line))
+    # TODO
+    pass
+
+with wave.open(wave_path, 'rb') as wav_file:
+    params = wav_file.getparams()
+    n_channels, width, rate, n_frames = params[:4]
+    str_data = wav_file.readframes(n_frames)  # 读取音频，字符串格式
+    wave_data = np.fromstring(str_data, dtype=np.int16)  # 将字符串转化为int
+    wave_data = wave_data*1.0/(max(abs(wave_data)))  # wave幅值归一化
+# Filter the data, and plot both the original and filtered signals.
+cut_off = 700
+order = 6
+
+t = np.arange(0, n_frames)*(1.0 / rate)
+y = butter_low_pass_filter(wave_data, cut_off, rate, order)
+
+plt.subplot(2, 1, 1)
+plt.plot(t, wave_data, 'b-', label='data')
+plt.plot(t, y, 'g-', linewidth=2, label='filtered data')
+# plt.axvline(0.52, color='k')
+for mark in marks:
+    plt.axvline(mark, color='black', linestyle="--")
+plt.xlabel('Time [sec]')
+plt.grid()
+plt.legend()
+
+plt.subplots_adjust(hspace=0.35)
+plt.show()

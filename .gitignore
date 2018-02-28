@@ -99,6 +99,7 @@ ENV/
 
 # mypy
 .mypy_cache/
+data/origin/*
 .idea/*
 log/*
 save/*
