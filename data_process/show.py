@@ -1,11 +1,12 @@
 # coding=utf-8
 import os
 import wave
-import numpy as np
-from scipy.signal import argrelextrema
-from matplotlib import pyplot as plt
 
-from feature_extractoin.low_pass_filter import butter_low_pass_filter
+import numpy as np
+from matplotlib import pyplot as plt
+from scipy.signal import argrelextrema
+
+from data_process.low_pass_filter import butter_low_pass_filter
 
 key = "aw01a1"
 wave_dir = "data/origin/cmu/APLAWDW/wav/"
