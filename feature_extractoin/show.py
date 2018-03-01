@@ -2,16 +2,18 @@
 import os
 import wave
 import numpy as np
+from scipy.signal import argrelextrema
 from matplotlib import pyplot as plt
 
-from filter.low_pass_filter import butter_low_pass_filter
+from feature_extractoin.low_pass_filter import butter_low_pass_filter
 
+key = "aw01a1"
 wave_dir = "data/origin/cmu/APLAWDW/wav/"
-wave_name = "aw01a0.wav"
+wave_name = key + ".wav"
 wave_path = os.path.join(wave_dir, wave_name)
 
 mark_dir = "data/origin/cmu/APLAWDW/marks/"
-mark_name = "aw01a0.marks"
+mark_name = key + ".marks"
 mark_path = os.path.join(mark_dir, mark_name)
 
 with open(mark_path, "r") as marks_file:
@@ -22,7 +24,6 @@ with open(mark_path, "r") as marks_file:
             break
         for line in lines:
             marks.append(float(line))
-    # TODO
     pass
 
 with wave.open(wave_path, 'rb') as wav_file:
@@ -38,12 +39,21 @@ order = 6
 t = np.arange(0, n_frames)*(1.0 / rate)
 y = butter_low_pass_filter(wave_data, cut_off, rate, order)
 
+local_min_idx = argrelextrema(y, np.less)
+local_min_idx = local_min_idx[0]
+
+threshold = -0.05
+local_min_idx = [idx for idx in local_min_idx if y[idx] < threshold]
+x = [idx * 1.0 / rate for idx in local_min_idx]
+print("Marks number: " + str(len(marks)))
+print("local minimum number: " + str(len(x)))
+
 plt.subplot(2, 1, 1)
 plt.plot(t, wave_data, 'b-', label='data')
 plt.plot(t, y, 'g-', linewidth=2, label='filtered data')
-# plt.axvline(0.52, color='k')
 for mark in marks:
     plt.axvline(mark, color='black', linestyle="--")
+plt.plot(x, y[local_min_idx], 'ks')
 plt.xlabel('Time [sec]')
 plt.grid()
 plt.legend()
