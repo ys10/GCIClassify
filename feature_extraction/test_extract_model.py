@@ -5,13 +5,13 @@ import os
 import tensorflow as tf
 import tqdm
 
-from discriminative_model.classify_model import ClassifyModel
-from discriminative_model.data_set import get_testing_set
+from feature_extraction.extract_model import ExtractModel
+from feature_extraction.data_set import get_testing_set
 from model_loader import load_model
 
 
 def get_args():
-    parser = argparse.ArgumentParser(description="DiscriminateNetwork")
+    parser = argparse.ArgumentParser(description="GlottalNet")
     parser.add_argument("--save_path", type=str, default="./save/")
     parser.add_argument("--testing_set_name", type=str, default="cmu/bdl")
     parser.add_argument("--log_path", type=str, default="./log/")
@@ -24,7 +24,7 @@ def main():
     tf.logging.set_verbosity(tf.logging.INFO)
     args = get_args()
     tf.logging.info("Test model on set: " + args.testing_set_name)
-    net = ClassifyModel()
+    net = ExtractModel()
     graph = tf.Graph()
     with graph.as_default():
         with tf.variable_scope("data"):

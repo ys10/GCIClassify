@@ -3,7 +3,7 @@ import tensorflow as tf
 import tensorflow.contrib.rnn as rnn
 
 
-class ExtractionModel(object):
+class ExtractModel(object):
     def __init__(self, name="ExtractionModel", extract_size=64, label_classes=2):
         self.name = name
         self.extract_size = extract_size

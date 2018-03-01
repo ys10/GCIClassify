@@ -5,13 +5,13 @@ import os
 import tensorflow as tf
 import tqdm
 
-from discriminative_model.classify_model import ClassifyModel
-from discriminative_model.data_set import get_training_set, get_validation_set
+from feature_extraction.extract_model import ExtractModel
+from feature_extraction.data_set import get_training_set, get_validation_set
 from model_loader import load_model, save_model
 
 
 def get_args():
-    parser = argparse.ArgumentParser(description="DiscriminateNetwork")
+    parser = argparse.ArgumentParser(description="GlottalNet")
     parser.add_argument("--save_path", type=str, default="./save/")
     parser.add_argument("--log_path", type=str, default="./log/")
     parser.add_argument("--training_epochs", type=int, default=600)
@@ -24,7 +24,7 @@ def get_args():
 def main():
     tf.logging.set_verbosity(tf.logging.INFO)
     args = get_args()
-    net = ClassifyModel()
+    net = ExtractModel()
     graph = tf.Graph()
     with graph.as_default():
         with tf.variable_scope("data"):
