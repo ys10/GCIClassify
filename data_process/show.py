@@ -8,7 +8,7 @@ from scipy.signal import argrelextrema
 
 from data_process.low_pass_filter import butter_low_pass_filter
 
-key = "aw01a1"
+key = "aw01a6"
 wave_dir = "data/origin/cmu/APLAWDW/wav/"
 wave_name = key + ".wav"
 wave_path = os.path.join(wave_dir, wave_name)

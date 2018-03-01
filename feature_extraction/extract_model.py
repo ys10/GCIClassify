@@ -11,11 +11,11 @@ class ExtractModel(object):
 
     def build(self, data, reuse=None, training=False):
         with tf.variable_scope(self.name, reuse=reuse):
-            features = tf.cast(data["features"], tf.float32)
+            wave = tf.cast(data["wave"], tf.float32)
             labels = tf.cast(data["labels"], tf.int32)
             with tf.variable_scope("cnn", reuse=reuse):
                 """extract feature from raw wave."""
-                output = tf.layers.conv1d(features, filters=16, kernel_size=7, strides=1, padding='valid',
+                output = tf.layers.conv1d(wave, filters=16, kernel_size=7, strides=1, padding='valid',
                                           activation=tf.nn.relu,  name="conv_layer_1")
                 output = tf.layers.max_pooling1d(output, pool_size=3, strides=2, padding='same',
                                                  name="pool_layer_1")
