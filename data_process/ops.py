@@ -115,8 +115,17 @@ def crop_wav(wav, center, radius):
     :param radius: crop radius
     :return: a slice whose length is radius*2 +1.
     """
-    cropped_wav = wav[center - radius: center + radius + 1]
-    # TODO
+    left_border = center - radius
+    right_border = center + radius + 1
+    if left_border < 0:
+        zeros = np.zeros(-left_border)
+        cropped_wav = np.concatenate([zeros, wav[0: right_border]])
+    elif right_border > len(wav):
+        zeros = np.zeros(right_border - len(wav))
+        cropped_wav = np.concatenate([wav[left_border: len(wav)], zeros])
+    else:
+        cropped_wav = wav[left_border: right_border]
+    assert len(cropped_wav) == radius * 2 + 1
     return cropped_wav
 
 

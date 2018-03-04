@@ -36,6 +36,8 @@ def main():
             """read raw wav & marks data."""
             rate, wav_data = read_wav_data(wav_path + key + wav_extension)
             wav_data = wav_data.astype(np.int64)
+            # wav_data = wav_data*1.0/(max(abs(wav_data)))  # wave幅值归一化
+            print(wav_data)
             wav_length = len(wav_data)
             marks_data = read_marks_data(marks_path + key + marks_extension, rate, wav_length)
             """filter raw wav"""

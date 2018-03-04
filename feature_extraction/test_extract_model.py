@@ -16,7 +16,8 @@ def get_args():
     parser.add_argument("--testing_set_name", type=str, default="cmu/bdl")
     parser.add_argument("--log_path", type=str, default="./log/")
     parser.add_argument("--testing_epochs", type=int, default=1)
-    parser.add_argument("--batch_size", type=int, default=128)
+    parser.add_argument("--testing_set_size", type=int, default=2)
+    parser.add_argument("--batch_size", type=int, default=2)
     return parser.parse_args()
 
 
@@ -28,8 +29,8 @@ def main():
     graph = tf.Graph()
     with graph.as_default():
         with tf.variable_scope("data"):
-            testing_set, testing_set_size = get_testing_set(key=args.testing_set_name,
-                                                            epochs=args.testing_epochs, batch_size=args.batch_size)
+            testing_set = get_testing_set(key=args.testing_set_name,
+                                          epochs=args.testing_epochs, batch_size=args.batch_size)
             iterator = testing_set.make_one_shot_iterator()
             next_element = iterator.get_next()
             testing_init_op = iterator.make_initializer(testing_set)
@@ -54,7 +55,7 @@ def main():
         total_recall = 0.0
         total_precision = 0.0
         global_step_eval = 0
-        testing_steps = args.testing_epochs * testing_set_size // args.batch_size
+        testing_steps = args.testing_epochs * args.testing_set_size // args.batch_size
         pbar = tqdm.tqdm(total=testing_steps)
         pbar.update(global_step_eval)
         sess.run(testing_init_op)

@@ -14,6 +14,8 @@ def get_args():
     parser = argparse.ArgumentParser(description="GlottalNet")
     parser.add_argument("--save_path", type=str, default="./save/")
     parser.add_argument("--log_path", type=str, default="./log/")
+    parser.add_argument("--training_set_size", type=int, default=8)
+    parser.add_argument("--validation_set_size", type=int, default=2)
     parser.add_argument("--training_epochs", type=int, default=600)
     parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--save_per_epochs", type=int, default=10)
@@ -28,15 +30,15 @@ def main():
     graph = tf.Graph()
     with graph.as_default():
         with tf.variable_scope("data"):
-            training_set, training_set_size = get_training_set(epochs=args.training_epochs, batch_size=args.batch_size)
-            validation_set, validation_set_size = get_validation_set(
-                epochs=args.training_epochs // args.validation_per_epochs)
+            training_set = get_training_set(epochs=args.training_epochs, batch_size=args.batch_size)
+            validation_set = get_validation_set(
+                epochs=args.training_epochs // args.validation_per_epochs, batch_size=args.validation_set_size)
             iterator = training_set.make_one_shot_iterator()
             next_element = iterator.get_next()
             training_init_op = iterator.make_initializer(training_set)
             validation_init_op = iterator.make_initializer(validation_set)
 
-        with tf.variable_scope("classify_model"):
+        with tf.variable_scope("extract_model"):
             tensor_dict = net.build(next_element, training=True)
             loss_summary = tf.summary.scalar("loss", tensor_dict["loss"])
             accuracy_summary = tf.summary.scalar("accuracy", tensor_dict["accuracy"])
@@ -61,9 +63,9 @@ def main():
         training_writer = tf.summary.FileWriter(os.path.join(args.log_path, "training"), sess.graph)
         validation_writer = tf.summary.FileWriter(os.path.join(args.log_path, "validation"), sess.graph)
         global_step_eval = sess.run(global_step)
-        training_steps = args.training_epochs * training_set_size // args.batch_size
-        save_steps = args.save_per_epochs * training_set_size // args.batch_size
-        validation_steps = args.validation_per_epochs * training_set_size // args.batch_size
+        training_steps = args.training_epochs * args.training_set_size // args.batch_size
+        save_steps = args.save_per_epochs * args.training_set_size // args.batch_size
+        validation_steps = args.validation_per_epochs * args.training_set_size // args.batch_size
         pbar = tqdm.tqdm(total=training_steps)
         pbar.update(global_step_eval)
         sess.run(training_init_op)
