@@ -5,16 +5,17 @@ import numpy as np
 from data_process.low_pass_filter import butter_low_pass_filter
 from data_process.ops import file_names, read_wav_data, read_marks_data, find_local_minimum, label_peaks, crop_wav
 
-marks_path = "data/origin/cmu/APLAWDW/marks/"
-wav_path = "data/origin/cmu/APLAWDW/wav/"
+marks_path = "data/origin/cmu/cstr_uk_rab_diphone/marks/"
+wav_path = "data/origin/cmu/cstr_uk_rab_diphone/wav/"
 marks_extension = ".marks"
 wav_extension = ".wav"
-data_path = "data/crop_sample/training.tfrecords"
+data_path = "data/crop_sample/rab_testing.tfrecords"
 cut_off = 700  # cut off frequency (Hz)
-filter_order = 5
+filter_order = 6
 crop_radius = 300  # number of sample
-local_minimum_threshold = -0.05  # normalized amplitude threshold
-peak_mark_threshold = 0.002  # (second) threshold used in labeling peak indices with marks data
+# local_minimum_threshold = -0.015  # normalized amplitude threshold
+local_minimum_threshold = -200  # amplitude threshold
+peak_mark_threshold = 0.005  # (second) threshold used in labeling peak indices with marks data
 
 
 def training_data_feature(wav, label, error):
@@ -27,6 +28,8 @@ def training_data_feature(wav, label, error):
 
 
 def main():
+    total_marks = 0
+    total_missed = 0
     with tf.python_io.TFRecordWriter(data_path) as writer:
         print("Process training data start!")
         keys = file_names(marks_path)
@@ -37,7 +40,7 @@ def main():
             rate, wav_data = read_wav_data(wav_path + key + wav_extension)
             wav_data = wav_data.astype(np.int64)
             # wav_data = wav_data*1.0/(max(abs(wav_data)))  # wave幅值归一化
-            print(wav_data)
+            # print(wav_data)
             wav_length = len(wav_data)
             marks_data = read_marks_data(marks_path + key + marks_extension, rate, wav_length)
             """filter raw wav"""
@@ -54,9 +57,17 @@ def main():
                 example = tf.train.Example(features=tf.train.Features(
                     feature=training_data_feature(cropped_wav, labels[i], error)))
                 writer.write(example.SerializeToString())
-            print("total marks: {}, missed marks: {}, positive sample: {}, negative sample: {}"
+            print("missed: " + str([m / rate for m in miss]))
+            print("utterance marks: {}, missed marks: {}, positive sample: {}, negative sample: {}"
                   .format(len(marks_data), len(miss), pos_cnt, len(peak_indices)-pos_cnt))
-        print("Done!")
+            total_marks += len(marks_data)
+            total_missed += len(miss)
+            if len(miss) / len(marks_data) > 0.01:
+                print("warning!")
+            # break
+        print("total marks: {}".format(total_marks))
+        print("total missed: {}".format(total_missed))
+    print("Done!")
 
 
 if __name__ == '__main__':

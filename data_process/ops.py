@@ -73,6 +73,68 @@ def read_marks_data(path, rate, wave_length):
 def label_peaks(peaks, marks, threshold):
     """
     Label peaks with marks.
+        Give a distance threshold, for all peaks within distance from mark no more than threshold.
+        Pick up target peak follow these priorities
+            1. nearest right peak;
+            2. nearest left peak;
+            3. missed.
+    :param peaks: peak indices.
+    :param marks: marks indices.
+    :param threshold: distance threshold between a couple of (peak, mark).
+    :return: a tuple(labels, errors, pos_cnt) where:
+        labels: peak labels.
+        errors: distance between peaks and marks(zero for negative sample)
+        miss: missed marks
+        pos_cnt: positive sample count.
+    """
+    labels = [0] * len(peaks)
+    errors = [0] * len(peaks)
+    miss = list()
+    pos_cnt = 0
+    current_peak = 0  # peak index
+    for i in range(len(marks)):
+        mark = marks[i]
+        if current_peak >= len(peaks) - 1:  # finally miss this mark & record it.
+            miss.append(mark)
+            continue
+        left_peaks = []
+        right_peaks = []
+        for j in range(current_peak, len(peaks)):
+            peak = peaks[j]
+            error = abs(peak-mark)
+            if peak < mark & error <= threshold:
+                left_peaks.append(j)
+            elif peak >= mark & error <= threshold:
+                right_peaks.append(j)
+            elif peak > mark:  # Key step
+                break
+        if len(right_peaks) > 0:  # nearest right peak exists.
+            peak_idx = right_peaks[0]
+        elif len(left_peaks) > 0:  # nearest right peak does not exist, but nearest left peak exists.
+            peak_idx = left_peaks[len(left_peaks) -1]
+        else:  # neither nearest right or left peak exists, finally miss this mark & record it.
+            miss.append(mark)
+            rate = 16000
+            # print("\tmissed mark: " + str(mark / rate))
+            # print("\tcurrent peak: " + str(peaks[current_peak] / rate))
+            continue
+        labels[peak_idx] = 1
+        peak = peaks[peak_idx]
+        error = abs(peak - mark)
+        errors[peak_idx] = error
+        pos_cnt += 1
+        current_peak = peak_idx + 1
+    assert len(peaks) == len(labels) == len(errors)
+    return labels, errors, miss, pos_cnt
+
+
+def old_label_peaks(peaks, marks, threshold):
+    """
+    Label peaks with marks.
+        Give a distance threshold, for all peaks within distance from mark no more than threshold.
+        Pick up target peak follow these priorities
+            1. nearest right peak;
+            2. missed.
     :param peaks: peak indices.
     :param marks: marks indices.
     :param threshold: distance threshold between a couple of (peak, mark).

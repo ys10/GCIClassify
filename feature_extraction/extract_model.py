@@ -54,7 +54,7 @@ def cnn(inputs, extract_size, reuse=None, training=False):
     with tf.variable_scope("cnn", reuse=reuse):
         """extract feature from raw wave."""
         output = inputs
-        for i in range(5):
+        for i in range(1, 6):
             output = tf.layers.conv1d(output, filters=2**i, kernel_size=7, strides=1, padding='same',
                                       activation=tf.nn.relu, name="conv_layer_"+str(i))
             output = tf.layers.max_pooling1d(output, pool_size=3, strides=2, padding='same',
