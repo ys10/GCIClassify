@@ -2,8 +2,8 @@
 import tensorflow as tf
 import numpy as np
 
-from data_process.low_pass_filter import butter_low_pass_filter
-from data_process.ops import file_names, read_wav_data, read_marks_data, find_local_minimum, label_peaks, crop_wav
+from low_pass_filter import butter_low_pass_filter
+from ops import file_names, read_wav_data, read_marks_data, find_local_minimum, label_peaks, crop_wav
 
 marks_path = "data/origin/cmu/cstr_uk_rab_diphone/marks/"
 wav_path = "data/origin/cmu/cstr_uk_rab_diphone/wav/"

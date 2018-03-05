@@ -5,8 +5,8 @@ import os
 import tensorflow as tf
 import tqdm
 
-from feature_extraction.extract_model import ExtractModel
-from feature_extraction.data_set import get_testing_set
+from extract_model import ExtractModel
+from data_set import get_testing_set
 from model_loader import load_model
 
 

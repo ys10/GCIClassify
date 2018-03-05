@@ -5,8 +5,8 @@ import os
 import tensorflow as tf
 import tqdm
 
-from discriminative_model.classify_model import ClassifyModel
-from discriminative_model.data_set import get_testing_set
+from classify_model import ClassifyModel
+from data_set import get_testing_set
 from model_loader import load_model
 
 

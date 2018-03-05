@@ -6,7 +6,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy.signal import argrelextrema
 
-from data_process.low_pass_filter import butter_low_pass_filter
+from low_pass_filter import butter_low_pass_filter
 
 key = "kdt_028"
 wave_dir = "data/origin/cmu/cmu_us_ked_timit/wav/"
