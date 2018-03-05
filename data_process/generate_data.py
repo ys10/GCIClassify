@@ -30,6 +30,7 @@ def training_data_feature(wav, label, error):
 def main():
     total_marks = 0
     total_missed = 0
+    total_peaks = 0
     with tf.python_io.TFRecordWriter(data_path) as writer:
         print("Process training data start!")
         keys = file_names(marks_path)
@@ -62,11 +63,13 @@ def main():
                   .format(len(marks_data), len(miss), pos_cnt, len(peak_indices)-pos_cnt))
             total_marks += len(marks_data)
             total_missed += len(miss)
+            total_peaks += len(peak_indices)
             if len(miss) / len(marks_data) > 0.01:
                 print("warning!")
             # break
         print("total marks: {}".format(total_marks))
         print("total missed: {}".format(total_missed))
+        print("total peaks: {}".format(total_peaks))
     print("Done!")
 
 
