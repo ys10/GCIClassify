@@ -30,9 +30,9 @@ with open(mark_path, "r") as marks_file:
 with wave.open(wave_path, 'rb') as wav_file:
     params = wav_file.getparams()
     n_channels, width, rate, n_frames = params[:4]
-    str_data = wav_file.readframes(n_frames)  # 读取音频，字符串格式
-    wave_data = np.fromstring(str_data, dtype=np.int16)  # 将字符串转化为int
-    # wave_data = wave_data*1.0/(max(abs(wave_data)))  # wave幅值归一化
+    str_data = wav_file.readframes(n_frames)  # read wave in string format
+    wave_data = np.fromstring(str_data, dtype=np.int16)  # transform string in to int
+    # wave_data = wave_data*1.0/(max(abs(wave_data)))  # wave amplitude normalization
 # Filter the data, and plot both the original and filtered signals.
 cut_off = 700
 order = 6
