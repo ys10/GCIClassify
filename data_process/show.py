@@ -6,13 +6,16 @@ from low_pass_filter import butter_low_pass_filter
 from ops import find_local_minimum, label_peaks, read_wav_data, read_marks_data
 
 
-def show_wav_info(rate, raw_wav, filtered_wav, mark_indices, positive_label_indices, negative_label_indices):
+def show_wav_info(rate, raw_wav, filtered_wav, mark_indices, missed_mark_indices,
+                  positive_label_indices, negative_label_indices):
     plt.subplot(2, 1, 1)
     time = np.arange(0, len(raw_wav))*(1.0 / rate)  # time.
     plt.plot(time, raw_wav, 'b-', label='raw_wav')  # draw raw wave data.
     plt.plot(time, filtered_wav, 'g-', linewidth=2, label='filtered_wav')  # draw filtered wave data.
-    for mark_idx in mark_indices:
-        plt.axvline(mark_idx / rate, color='yellow', linestyle="--")  # draw mark locations
+    for mark_idx in list(set(mark_indices) - set(missed_mark_indices)):
+        plt.axvline(mark_idx / rate, color='yellow', linestyle="--")  # draw identified mark locations
+    for mark_idx in missed_mark_indices:
+        plt.axvline(mark_idx / rate, color='purple', linestyle="--")  # draw missed mark locations
     plt.scatter([i / rate for i in positive_label_indices], filtered_wav[positive_label_indices],
                 color='red', label="positive_label")
     plt.scatter([i / rate for i in negative_label_indices], filtered_wav[negative_label_indices],
@@ -48,10 +51,17 @@ def main():
 
     """make labels"""
     peak_mark_threshold = 0.005
-    labels, errors, miss, pos_cnt = label_peaks(peak_indices, mark_indices, int(peak_mark_threshold * rate))
+    labels, errors, missed_mark_indices, pos_cnt = label_peaks(peak_indices, mark_indices,
+                                                               int(peak_mark_threshold * rate))
     positive_label_indices = [peak_indices[i] for i in [idx for idx, label in enumerate(labels) if label == 1]]
     negative_label_indices = [peak_indices[i] for i in [idx for idx, label in enumerate(labels) if label == 0]]
-    show_wav_info(rate, raw_wav, filtered_wav, mark_indices, positive_label_indices, negative_label_indices)
+    show_wav_info(rate=rate,
+                  raw_wav=raw_wav,
+                  filtered_wav=filtered_wav,
+                  mark_indices=mark_indices,
+                  missed_mark_indices=missed_mark_indices,
+                  positive_label_indices=positive_label_indices,
+                  negative_label_indices=negative_label_indices)
 
 
 if __name__ == "__main__":
