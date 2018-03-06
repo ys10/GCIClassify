@@ -35,7 +35,7 @@ def main():
             next_element = iterator.get_next()
             testing_init_op = iterator.make_initializer(testing_set)
 
-        with tf.variable_scope("classify_model"):
+        with tf.variable_scope("extract_model"):
             tensor_dict = net.build(next_element, training=False)
             loss = tensor_dict["loss"]
             accuracy = tensor_dict["accuracy"]
