@@ -1,64 +1,56 @@
 # coding=utf-8
 import os
-import wave
-
 import numpy as np
 from matplotlib import pyplot as plt
-from scipy.signal import argrelextrema
-
 from low_pass_filter import butter_low_pass_filter
+from ops import find_local_minimum, label_peaks, read_wav_data, read_marks_data
 
-key = "kdt_028"
-wave_dir = "data/origin/cmu/cmu_us_ked_timit/wav/"
-wave_name = key + ".wav"
-wave_path = os.path.join(wave_dir, wave_name)
 
-mark_dir = "data/origin/cmu/cmu_us_ked_timit/marks/"
-mark_name = key + ".marks"
-mark_path = os.path.join(mark_dir, mark_name)
+def show_wav_info(rate, raw_wav, filtered_wav, mark_indices, positive_label_indices, negative_label_indices):
+    plt.subplot(2, 1, 1)
+    time = np.arange(0, len(raw_wav))*(1.0 / rate)  # time.
+    plt.plot(time, raw_wav, 'b-', label='raw_wav')  # draw raw wave data.
+    plt.plot(time, filtered_wav, 'g-', linewidth=2, label='filtered_wav')  # draw filtered wave data.
+    for mark_idx in mark_indices:
+        plt.axvline(mark_idx / rate, color='yellow', linestyle="--")  # draw mark locations
+    plt.scatter([i / rate for i in positive_label_indices], filtered_wav[positive_label_indices], color='red')
+    plt.scatter([i / rate for i in negative_label_indices], filtered_wav[negative_label_indices], color='black')
+    plt.xlabel('Time [sec]')
+    plt.grid()
+    plt.legend()
+    plt.subplots_adjust(hspace=0.35)
+    plt.show()
 
-with open(mark_path, "r") as marks_file:
-    marks = list()
-    while 1:
-        lines = marks_file.readlines(1000)
-        if not lines:
-            break
-        for line in lines:
-            marks.append(float(line))
-    pass
 
-with wave.open(wave_path, 'rb') as wav_file:
-    params = wav_file.getparams()
-    n_channels, width, rate, n_frames = params[:4]
-    str_data = wav_file.readframes(n_frames)  # read wave in string format
-    wave_data = np.fromstring(str_data, dtype=np.int16)  # transform string in to int
-    # wave_data = wave_data*1.0/(max(abs(wave_data)))  # wave amplitude normalization
-# Filter the data, and plot both the original and filtered signals.
-cut_off = 700
-order = 6
+def main():
+    key = "kdt_028"
+    wav_dir = "data/origin/cmu/cmu_us_ked_timit/wav/"
+    wav_name = key + ".wav"
+    wav_path = os.path.join(wav_dir, wav_name)
 
-t = np.arange(0, n_frames)*(1.0 / rate)
-y = butter_low_pass_filter(wave_data, cut_off, rate, order)
+    marks_dir = "data/origin/cmu/cmu_us_ked_timit/marks/"
+    marks_name = key + ".marks"
+    marks_path = os.path.join(marks_dir, marks_name)
 
-local_min_idx = argrelextrema(y, np.less)
-local_min_idx = local_min_idx[0]
+    print("key: {}".format(key))
+    """read raw wav & marks data."""
+    rate, raw_wav = read_wav_data(wav_path)
+    raw_wav = raw_wav.astype(np.int64)
+    wav_length = len(raw_wav)
+    mark_indices = read_marks_data(marks_path, rate, wav_length)
 
-# threshold = -0.015 * rate
-threshold = -200
-local_min_idx = [idx for idx in local_min_idx if y[idx] < threshold]
-x = [idx * 1.0 / rate for idx in local_min_idx]
-print("Marks number: " + str(len(marks)))
-print("local minimum number: " + str(len(x)))
+    filtered_wav = butter_low_pass_filter(raw_wav, cut_off=700, rate=rate, order=6)
+    peak_indices = find_local_minimum(filtered_wav, threshold=-200)
+    print("Marks number: " + str(len(mark_indices)))
+    print("local minimum number: " + str(len(peak_indices)))
 
-plt.subplot(2, 1, 1)
-plt.plot(t, wave_data, 'b-', label='data')
-plt.plot(t, y, 'g-', linewidth=2, label='filtered data')
-for mark in marks:
-    plt.axvline(mark, color='red', linestyle="--")
-plt.plot(x, y[local_min_idx], 'ks')
-plt.xlabel('Time [sec]')
-plt.grid()
-plt.legend()
+    """make labels"""
+    peak_mark_threshold = 0.005
+    labels, errors, miss, pos_cnt = label_peaks(peak_indices, mark_indices, int(peak_mark_threshold * rate))
+    positive_label_indices = [peak_indices[i] for i in [idx for idx, label in enumerate(labels) if label == 1]]
+    negative_label_indices = [peak_indices[i] for i in [idx for idx, label in enumerate(labels) if label == 0]]
+    show_wav_info(rate, raw_wav, filtered_wav, mark_indices, positive_label_indices, negative_label_indices)
 
-plt.subplots_adjust(hspace=0.35)
-plt.show()
+
+if __name__ == "__main__":
+    main()
