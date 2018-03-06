@@ -13,8 +13,10 @@ def show_wav_info(rate, raw_wav, filtered_wav, mark_indices, positive_label_indi
     plt.plot(time, filtered_wav, 'g-', linewidth=2, label='filtered_wav')  # draw filtered wave data.
     for mark_idx in mark_indices:
         plt.axvline(mark_idx / rate, color='yellow', linestyle="--")  # draw mark locations
-    plt.scatter([i / rate for i in positive_label_indices], filtered_wav[positive_label_indices], color='red')
-    plt.scatter([i / rate for i in negative_label_indices], filtered_wav[negative_label_indices], color='black')
+    plt.scatter([i / rate for i in positive_label_indices], filtered_wav[positive_label_indices],
+                color='red', label="positive_label")
+    plt.scatter([i / rate for i in negative_label_indices], filtered_wav[negative_label_indices],
+                color='black', label="negative_label")
     plt.xlabel('Time [sec]')
     plt.grid()
     plt.legend()
