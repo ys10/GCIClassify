@@ -8,7 +8,7 @@ from ops import find_local_minimum, label_peaks, read_wav_data, read_marks_data
 
 def show_wav_info(rate, raw_wav, filtered_wav, mark_indices, missed_mark_indices,
                   positive_label_indices, negative_label_indices):
-    plt.subplot(2, 1, 1)
+    plt.subplot(1, 1, 1)
     time = np.arange(0, len(raw_wav))*(1.0 / rate)  # time.
     plt.plot(time, raw_wav, 'b-', label='raw_wav')  # draw raw wave data.
     plt.plot(time, filtered_wav, 'g-', linewidth=2, label='filtered_wav')  # draw filtered wave data.
@@ -28,7 +28,7 @@ def show_wav_info(rate, raw_wav, filtered_wav, mark_indices, missed_mark_indices
 
 
 def main():
-    key = "kdt_028"
+    key = "kdt_027"
     wav_dir = "data/origin/cmu/cmu_us_ked_timit/wav/"
     wav_name = key + ".wav"
     wav_path = os.path.join(wav_dir, wav_name)
@@ -50,7 +50,7 @@ def main():
     print("local minimum number: " + str(len(peak_indices)))
 
     """make labels"""
-    peak_mark_threshold = 0.005
+    peak_mark_threshold = 0.002
     labels, errors, missed_mark_indices, pos_cnt = label_peaks(peak_indices, mark_indices,
                                                                int(peak_mark_threshold * rate))
     positive_label_indices = [peak_indices[i] for i in [idx for idx, label in enumerate(labels) if label == 1]]
