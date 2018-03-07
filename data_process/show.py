@@ -28,12 +28,12 @@ def show_wav_info(rate, raw_wav, filtered_wav, mark_indices, missed_mark_indices
 
 
 def main():
-    key = "kdt_027"
-    wav_dir = "data/origin/cmu/cmu_us_ked_timit/wav/"
+    key = "edx_1383"
+    wav_dir = "data/origin/cmu/cstr_uk_rab_diphone/wav/"
     wav_name = key + ".wav"
     wav_path = os.path.join(wav_dir, wav_name)
 
-    marks_dir = "data/origin/cmu/cmu_us_ked_timit/marks/"
+    marks_dir = "data/origin/cmu/cstr_uk_rab_diphone/marks/"
     marks_name = key + ".marks"
     marks_path = os.path.join(marks_dir, marks_name)
 
@@ -50,11 +50,13 @@ def main():
     print("local minimum number: " + str(len(peak_indices)))
 
     """make labels"""
-    peak_mark_threshold = 0.002
+    peak_mark_threshold = 0.005
     labels, errors, missed_mark_indices, pos_cnt = label_peaks(peak_indices, mark_indices,
                                                                int(peak_mark_threshold * rate))
     positive_label_indices = [peak_indices[i] for i in [idx for idx, label in enumerate(labels) if label == 1]]
     negative_label_indices = [peak_indices[i] for i in [idx for idx, label in enumerate(labels) if label == 0]]
+    print("positive_label_count: {}".format(len(positive_label_indices)))
+    print("negative_label_count: {}".format(len(negative_label_indices)))
     show_wav_info(rate=rate,
                   raw_wav=raw_wav,
                   filtered_wav=filtered_wav,

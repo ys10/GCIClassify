@@ -15,7 +15,7 @@ filter_order = 6
 crop_radius = 300  # number of sample
 # local_minimum_threshold = -0.015  # normalized amplitude threshold
 local_minimum_threshold = -200  # amplitude threshold
-peak_mark_threshold = 0.002  # (second) threshold used in labeling peak indices with marks data
+peak_mark_threshold = 0.005  # (second) threshold used in labeling peak indices with marks data
 
 
 def training_data_feature(wav, label, error):
