@@ -27,24 +27,29 @@ def show_wav_info(rate, raw_wav, filtered_wav, mark_indices, missed_mark_indices
     plt.show()
 
 
-def main():
-    key = "edx_1383"
-    wav_dir = "data/origin/cmu/cstr_uk_rab_diphone/wav/"
+def main(key, data_set_path):
+    print("key: {}".format(key))
+
+    wav_dir = os.path.join(data_set_path, "wav/")
     wav_name = key + ".wav"
     wav_path = os.path.join(wav_dir, wav_name)
 
-    marks_dir = "data/origin/cmu/cstr_uk_rab_diphone/marks/"
+    marks_dir = os.path.join(data_set_path, "marks/")
     marks_name = key + ".marks"
     marks_path = os.path.join(marks_dir, marks_name)
 
-    print("key: {}".format(key))
     """read raw wav & marks data."""
     rate, raw_wav = read_wav_data(wav_path)
     raw_wav = raw_wav.astype(np.int64)
     wav_length = len(raw_wav)
     mark_indices = read_marks_data(marks_path, rate, wav_length)
 
+    """filter wave by a low pass filter with 700 Hz cutoff frequency"""
     filtered_wav = butter_low_pass_filter(raw_wav, cut_off=700, rate=rate, order=6)
+    length = len(raw_wav)
+    delay = int(rate * 0.001)  # default low pass filter delay
+    raw_wav = raw_wav[:length - delay]
+    filtered_wav = filtered_wav[delay:]
     peak_indices = find_local_minimum(filtered_wav, threshold=-200)
     print("Marks number: " + str(len(mark_indices)))
     print("local minimum number: " + str(len(peak_indices)))
@@ -57,6 +62,8 @@ def main():
     negative_label_indices = [peak_indices[i] for i in [idx for idx, label in enumerate(labels) if label == 0]]
     print("positive_label_count: {}".format(len(positive_label_indices)))
     print("negative_label_count: {}".format(len(negative_label_indices)))
+
+    """show wave info"""
     show_wav_info(rate=rate,
                   raw_wav=raw_wav,
                   filtered_wav=filtered_wav,
@@ -67,4 +74,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # _key = "edx_1384"
+    # _data_set_path = "data/origin/cmu/cstr_uk_rab_diphone/"
+    _key = "kdt_001"
+    _data_set_path = "data/origin/cmu/cmu_us_ked_timit/"
+    main(_key, _data_set_path)

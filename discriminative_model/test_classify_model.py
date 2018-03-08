@@ -6,7 +6,7 @@ import tensorflow as tf
 import tqdm
 
 from classify_model import ClassifyModel
-from data_set import get_testing_set
+from data_set import get_testing_set, get_training_set
 from model_loader import load_model
 
 
@@ -30,6 +30,7 @@ def main():
         with tf.variable_scope("data"):
             testing_set, testing_set_size = get_testing_set(key=args.testing_set_name,
                                                             epochs=args.testing_epochs, batch_size=args.batch_size)
+            # testing_set, testing_set_size = get_training_set(epochs=args.testing_epochs, batch_size=args.batch_size)
             iterator = testing_set.make_one_shot_iterator()
             next_element = iterator.get_next()
             testing_init_op = iterator.make_initializer(testing_set)
