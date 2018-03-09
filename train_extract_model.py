@@ -70,6 +70,20 @@ def main():
         pbar.update(global_step_eval)
         sess.run(training_init_op)
         while global_step_eval < training_steps:
+            """validation"""
+            if global_step_eval % validation_steps == 0:
+                sess.run(validation_init_op)
+                validation_list = [loss_summary, accuracy_summary, recall_summary, precision_summary, f1_score_summary]
+                validation_loss_summary_eval, validation_accuracy_summary_eval, validation_recall_summary_eval,\
+                    validation_precision_summary_eval, validation_f1_score_summary_eval = sess.run(validation_list)
+                validation_writer.add_summary(validation_loss_summary_eval, global_step=global_step_eval)
+                validation_writer.add_summary(validation_accuracy_summary_eval, global_step=global_step_eval)
+                validation_writer.add_summary(validation_recall_summary_eval, global_step=global_step_eval)
+                validation_writer.add_summary(validation_precision_summary_eval, global_step=global_step_eval)
+                validation_writer.add_summary(validation_f1_score_summary_eval, global_step=global_step_eval)
+                tf.logging.info("Validation done.")
+                sess.run(training_init_op)
+            """training"""
             training_list = [loss_summary, accuracy_summary, recall_summary, precision_summary,
                              f1_score_summary, global_step, upd]
             training_loss_summary_eval, training_accuracy_summary_eval, training_recall_summary_eval,\
@@ -85,19 +99,6 @@ def main():
                 if not os.path.exists(args.save_path) or not os.path.isdir(args.save_path):
                     os.makedirs(args.save_path)
                 save_model(saver, sess, save_path, global_step_eval)
-            """validation"""
-            if global_step_eval % validation_steps == 0:
-                sess.run(validation_init_op)
-                validation_list = [loss_summary, accuracy_summary, recall_summary, precision_summary, f1_score_summary]
-                validation_loss_summary_eval, validation_accuracy_summary_eval, validation_recall_summary_eval,\
-                    validation_precision_summary_eval, validation_f1_score_summary_eval = sess.run(validation_list)
-                validation_writer.add_summary(validation_loss_summary_eval, global_step=global_step_eval)
-                validation_writer.add_summary(validation_accuracy_summary_eval, global_step=global_step_eval)
-                validation_writer.add_summary(validation_recall_summary_eval, global_step=global_step_eval)
-                validation_writer.add_summary(validation_precision_summary_eval, global_step=global_step_eval)
-                validation_writer.add_summary(validation_f1_score_summary_eval, global_step=global_step_eval)
-                tf.logging.info("Validation done.")
-                sess.run(training_init_op)
             pbar.update(1)
 
     tf.logging.info("Congratulations!")
