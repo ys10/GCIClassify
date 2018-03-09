@@ -103,9 +103,9 @@ def label_peaks(peaks, marks, threshold):
                 continue
             elif peak > search_range["right"]:
                 continue
-            elif search_range["left"] <= peak <= mark:  # in left half search range
+            elif search_range["left"] <= peak < mark:  # in left half search range
                 left_peaks.append(j)
-            elif mark < peak <= search_range["right"]:  # in right half search range
+            elif mark <= peak <= search_range["right"]:  # in right half search range
                 right_peaks.append(j)
             else:
                 print("mark: {}, peak: {}, threshold: {}".format(mark, peak, threshold))
