@@ -26,10 +26,6 @@ class ExtractModel(object):
             logits = tf.layers.dense(inputs=dense_output, units=self.label_classes, name="output_layer")
             # logits = tf.squeeze(logits, axis=1)  # squeeze time step dimension
             metric_dict = metrics(logits=logits, labels=labels)
-            # metric_dict["wav"] = wav
-            # metric_dict["cnn_output"] = cnn_output
-            # metric_dict["rnn_output"] = rnn_output
-            # metric_dict["dense_output"] = dense_output
             return metric_dict
 
 
@@ -103,11 +99,17 @@ def bi_rnn(inputs, extract_size, reuse=None):
 def dense(inputs, reuse=None, training=False):
     with tf.variable_scope("fully_connected", reuse=reuse):
         """classify output of RNN by a fully-connected network."""
-        output = tf.nn.dropout(x=inputs, keep_prob=0.5)
+        if training:
+            keep_prob = 0.7
+        else:
+            keep_prob = 1
+        output = tf.nn.dropout(x=inputs, keep_prob=keep_prob)
         output = tf.layers.dense(inputs=output, units=64, activation=tf.nn.relu, name="dense_layer_1")
         output = tf.layers.batch_normalization(output, training=training, name="bn_layer_1")
+        output = tf.nn.dropout(x=output, keep_prob=keep_prob)
         output = tf.layers.dense(inputs=output, units=16, activation=tf.nn.relu, name="dense_layer_2")
         output = tf.layers.batch_normalization(output, training=training, name="bn_layer_2")
+        output = tf.nn.dropout(x=output, keep_prob=keep_prob)
         output = tf.layers.dense(inputs=output, units=8, activation=tf.nn.relu, name="dense_layer_3")
         output = tf.layers.batch_normalization(output, training=training, name="bn_layer_3")
         # TODO classify output of RNN by a fully-connected network.
