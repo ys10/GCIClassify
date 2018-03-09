@@ -61,8 +61,8 @@ def cnn(inputs, extract_size, reuse=None, training=False):
                                              name="pool_layer_"+str(i))
             output = tf.layers.batch_normalization(output, training=training, name="bn_layer_"+str(i))
         output = tf.layers.conv1d(output, filters=extract_size, kernel_size=2, strides=1, padding='valid',
-                                  activation=tf.nn.relu, name="conv_layer_6")
-        output = tf.layers.batch_normalization(output, training=training, name="bn_layer_6")
+                                  activation=tf.nn.relu, name="conv_layer_9")
+        output = tf.layers.batch_normalization(output, training=training, name="bn_layer_9")
         # TODO extract feature from raw wave.
     return output
 
