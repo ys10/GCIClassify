@@ -5,7 +5,7 @@ import tensorflow.contrib.rnn as rnn
 
 
 class ExtractModel(object):
-    def __init__(self, name="ExtractionModel", extract_size=64, label_classes=2):
+    def __init__(self, name="ExtractionModel", extract_size=256, label_classes=2):
         self.name = name
         self.extract_size = extract_size
         self.label_classes = label_classes
@@ -54,13 +54,13 @@ def cnn(inputs, extract_size, reuse=None, training=False):
     with tf.variable_scope("cnn", reuse=reuse):
         """extract feature from raw wave."""
         output = inputs
-        for i in range(1, 6):
+        for i in range(1, 9):
             output = tf.layers.conv1d(output, filters=2**i, kernel_size=7, strides=1, padding='same',
                                       activation=tf.nn.relu, name="conv_layer_"+str(i))
             output = tf.layers.max_pooling1d(output, pool_size=3, strides=2, padding='same',
                                              name="pool_layer_"+str(i))
             output = tf.layers.batch_normalization(output, training=training, name="bn_layer_"+str(i))
-        output = tf.layers.conv1d(output, filters=extract_size, kernel_size=19, strides=1, padding='valid',
+        output = tf.layers.conv1d(output, filters=extract_size, kernel_size=2, strides=1, padding='valid',
                                   activation=tf.nn.relu, name="conv_layer_6")
         output = tf.layers.batch_normalization(output, training=training, name="bn_layer_6")
         # TODO extract feature from raw wave.
