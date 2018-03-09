@@ -38,14 +38,19 @@ def main():
         for key in keys:
             print("key: {}".format(key))
             """read raw wav & marks data."""
-            rate, wav_data = read_wav_data(wav_path + key + wav_extension)
-            wav_data = wav_data.astype(np.int64)
-            # wav_data = wav_data*1.0/(max(abs(wav_data)))  # wave amplitude normalization
-            # print(wav_data)
-            wav_length = len(wav_data)
+            rate, raw_wav = read_wav_data(wav_path + key + wav_extension)
+            raw_wav = raw_wav.astype(np.int64)
+            # raw_wav = raw_wav*1.0/(max(abs(raw_wav)))  # wave amplitude normalization
+            # print(raw_wav)
+            wav_length = len(raw_wav)
             marks_data = read_marks_data(marks_path + key + marks_extension, rate, wav_length)
             """filter raw wav"""
-            filtered_wav = butter_low_pass_filter(wav_data, cut_off=cut_off, rate=rate, order=filter_order)
+            filtered_wav = butter_low_pass_filter(raw_wav, cut_off=cut_off, rate=rate, order=filter_order)
+            """delay filtered wav"""
+            length = len(raw_wav)
+            delay = int(rate * 0.001)  # default low pass filter delay
+            raw_wav = raw_wav[:length - delay]
+            filtered_wav = filtered_wav[delay:]
             """find negative peaks in filtered wav"""
             peak_indices = find_local_minimum(filtered_wav, threshold=local_minimum_threshold)
             """make labels"""
@@ -53,7 +58,8 @@ def main():
             """package output data"""
             for i in range(len(peak_indices)):
                 peak_idx = peak_indices[i]
-                cropped_wav = crop_wav(filtered_wav, peak_idx, crop_radius)
+                # cropped_wav = crop_wav(filtered_wav, peak_idx, crop_radius)
+                cropped_wav = crop_wav(raw_wav, peak_idx, crop_radius)
                 error = errors[i]
                 example = tf.train.Example(features=tf.train.Features(
                     feature=training_data_feature(cropped_wav, labels[i], error)))
