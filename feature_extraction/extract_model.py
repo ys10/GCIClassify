@@ -54,8 +54,14 @@ def cnn(inputs, extract_size, reuse=None, training=False):
     with tf.variable_scope("cnn", reuse=reuse):
         """extract feature from raw wave."""
         output = inputs
-        for i in range(1, 9):
-            output = tf.layers.conv1d(output, filters=2**i, kernel_size=7, strides=1, padding='same',
+        for i in range(1, 7):
+            output = tf.layers.conv1d(output, filters=2**(i+3), kernel_size=7, strides=1, padding='same',
+                                      activation=tf.nn.relu, name="conv_layer_"+str(i))
+            output = tf.layers.max_pooling1d(output, pool_size=3, strides=2, padding='same',
+                                             name="pool_layer_"+str(i))
+            output = tf.layers.batch_normalization(output, training=training, name="bn_layer_"+str(i))
+        for i in range(7, 9):
+            output = tf.layers.conv1d(output, filters=extract_size, kernel_size=7, strides=1, padding='same',
                                       activation=tf.nn.relu, name="conv_layer_"+str(i))
             output = tf.layers.max_pooling1d(output, pool_size=3, strides=2, padding='same',
                                              name="pool_layer_"+str(i))
@@ -97,7 +103,8 @@ def bi_rnn(inputs, extract_size, reuse=None):
 def dense(inputs, reuse=None, training=False):
     with tf.variable_scope("fully_connected", reuse=reuse):
         """classify output of RNN by a fully-connected network."""
-        output = tf.layers.dense(inputs=inputs, units=32, activation=tf.nn.relu, name="dense_layer_1")
+        output = tf.nn.dropout(x=inputs, keep_prob=0.5)
+        output = tf.layers.dense(inputs=output, units=64, activation=tf.nn.relu, name="dense_layer_1")
         output = tf.layers.batch_normalization(output, training=training, name="bn_layer_1")
         output = tf.layers.dense(inputs=output, units=16, activation=tf.nn.relu, name="dense_layer_2")
         output = tf.layers.batch_normalization(output, training=training, name="bn_layer_2")
