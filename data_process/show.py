@@ -49,8 +49,11 @@ def main(key, data_set_path):
     length = len(raw_wav)
     delay = int(rate * 0.001)  # default low pass filter delay
     raw_wav = raw_wav[:length - delay]
+    peak_indices = find_local_minimum(filtered_wav, threshold=-200)
+    print("no-delay indices: " + str(peak_indices))
     filtered_wav = filtered_wav[delay:]
     peak_indices = find_local_minimum(filtered_wav, threshold=-200)
+    print("delay indices: " + str(peak_indices))
     print("Marks number: " + str(len(mark_indices)))
     print("local minimum number: " + str(len(peak_indices)))
 
@@ -76,6 +79,6 @@ def main(key, data_set_path):
 if __name__ == "__main__":
     # _key = "edx_1384"
     # _data_set_path = "data/origin/cmu/cstr_uk_rab_diphone/"
-    _key = "kdt_001"
+    _key = "kdt_279"
     _data_set_path = "data/origin/cmu/cmu_us_ked_timit/"
     main(_key, _data_set_path)
