@@ -6,16 +6,16 @@ import tensorflow as tf
 import tqdm
 
 from feature_extraction.extract_model import ExtractModel
-from feature_extraction.data_set import get_training_set, get_validation_set
+from feature_extraction.data_set import get_testing_set
 from model_loader import load_model, save_model
+from data_set_args import get_rab_set_args, get_ked_set_args,\
+    get_bdl_set_args, get_jmk_set_args, get_slt_set_args
 
 
 def get_args():
     parser = argparse.ArgumentParser(description="GlottalNet")
     parser.add_argument("--save_path", type=str, default="./save/")
     parser.add_argument("--log_path", type=str, default="./log/")
-    parser.add_argument("--training_set_size", type=int, default=308514)
-    parser.add_argument("--validation_set_size", type=int, default=16750)
     parser.add_argument("--training_epochs", type=int, default=100)
     parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--save_per_epochs", type=int, default=10)
@@ -26,13 +26,16 @@ def get_args():
 def main():
     tf.logging.set_verbosity(tf.logging.INFO)
     args = get_args()
+    data_set_args = get_ked_set_args()
     net = ExtractModel()
     graph = tf.Graph()
     with graph.as_default():
         with tf.variable_scope("data"):
-            training_set = get_training_set(epochs=args.training_epochs, batch_size=args.batch_size)
-            validation_set = get_validation_set(
-                epochs=args.training_epochs // args.validation_per_epochs, batch_size=args.validation_set_size)
+            training_set = get_testing_set(key=data_set_args.training_set_name,
+                                           epochs=args.training_epochs, batch_size=args.batch_size)
+            validation_set = get_testing_set(key=data_set_args.validation_set_name,
+                                             epochs=args.training_epochs // args.validation_per_epochs,
+                                             batch_size=data_set_args.validation_set_size)
             iterator = training_set.make_one_shot_iterator()
             next_element = iterator.get_next()
             training_init_op = iterator.make_initializer(training_set)
@@ -63,9 +66,9 @@ def main():
         training_writer = tf.summary.FileWriter(os.path.join(args.log_path, "training"), sess.graph)
         validation_writer = tf.summary.FileWriter(os.path.join(args.log_path, "validation"), sess.graph)
         global_step_eval = sess.run(global_step)
-        training_steps = args.training_epochs * args.training_set_size // args.batch_size
-        save_steps = args.save_per_epochs * args.training_set_size // args.batch_size
-        validation_steps = args.validation_per_epochs * args.training_set_size // args.batch_size
+        training_steps = args.training_epochs * data_set_args.training_set_size // args.batch_size
+        save_steps = args.save_per_epochs * data_set_args.training_set_size // args.batch_size
+        validation_steps = args.validation_per_epochs * data_set_args.training_set_size // args.batch_size
         pbar = tqdm.tqdm(total=training_steps)
         pbar.update(global_step_eval)
         sess.run(training_init_op)

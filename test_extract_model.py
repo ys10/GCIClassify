@@ -8,15 +8,15 @@ import tqdm
 from feature_extraction.extract_model import ExtractModel
 from feature_extraction.data_set import get_testing_set
 from model_loader import load_model
+from data_set_args import get_rab_set_args, get_ked_set_args,\
+    get_bdl_set_args, get_jmk_set_args, get_slt_set_args
 
 
 def get_args():
     parser = argparse.ArgumentParser(description="GlottalNet")
     parser.add_argument("--save_path", type=str, default="./save/")
-    parser.add_argument("--testing_set_name", type=str, default="ked_testing")
     parser.add_argument("--log_path", type=str, default="./log/")
     parser.add_argument("--testing_epochs", type=int, default=1)
-    parser.add_argument("--testing_set_size", type=int, default=247533)
     parser.add_argument("--batch_size", type=int, default=64)
     return parser.parse_args()
 
@@ -24,12 +24,13 @@ def get_args():
 def main():
     tf.logging.set_verbosity(tf.logging.INFO)
     args = get_args()
-    tf.logging.info("Test model on set: " + args.testing_set_name)
+    data_set_args = get_rab_set_args()
+    tf.logging.info("Test model on set: " + data_set_args.training_set_name)
     net = ExtractModel()
     graph = tf.Graph()
     with graph.as_default():
         with tf.variable_scope("data"):
-            testing_set = get_testing_set(key=args.testing_set_name,
+            testing_set = get_testing_set(key=data_set_args.training_set_name,
                                           epochs=args.testing_epochs, batch_size=args.batch_size)
             iterator = testing_set.make_one_shot_iterator()
             next_element = iterator.get_next()
@@ -55,7 +56,7 @@ def main():
         total_recall = 0.0
         total_precision = 0.0
         global_step_eval = 0
-        testing_steps = args.testing_epochs * args.testing_set_size // args.batch_size
+        testing_steps = args.testing_epochs * data_set_args.training_set_size // args.batch_size
         pbar = tqdm.tqdm(total=testing_steps)
         pbar.update(global_step_eval)
         sess.run(testing_init_op)
