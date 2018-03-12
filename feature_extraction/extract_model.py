@@ -118,7 +118,7 @@ def dense(inputs, reuse=None, training=False):
 
 def metrics(logits, labels):
     variables = tf.trainable_variables()
-    l2_loss = tf.add_n([tf.nn.l2_loss(v) for v in variables if 'bias' not in v.name]) * 0.001
+    l2_loss = tf.add_n([tf.nn.l2_loss(v) for v in variables if 'bias' not in v.name]) * 1e-5
     loss = tf.reduce_mean(tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)) + l2_loss
     predictions = tf.argmax(logits, axis=-1)
     acc, acc_op = tf.metrics.accuracy(labels, predictions)
