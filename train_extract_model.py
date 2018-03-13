@@ -9,7 +9,8 @@ from feature_extraction.extract_model import ExtractModel
 from feature_extraction.data_set import get_testing_set
 from model_loader import load_model, save_model
 from data_set_args import get_rab_set_args, get_ked_set_args,\
-    get_bdl_set_args, get_jmk_set_args, get_slt_set_args
+    get_bdl_set_args, get_jmk_set_args, get_slt_set_args,\
+    get_mix2_set_args, get_mix3_set_args
 
 
 def get_args():
