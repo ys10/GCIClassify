@@ -45,3 +45,21 @@ def get_slt_set_args():
     parser.add_argument("--training_set_size", type=int, default=668007)
     parser.add_argument("--validation_set_size", type=int, default=67269)
     return parser.parse_args()
+
+
+def get_mix2_set_args():
+    parser = argparse.ArgumentParser(description="mix2_set")
+    parser.add_argument("--training_set_name", type=str, default="mix2_training")
+    parser.add_argument("--validation_set_name", type=str, default="mix2_validation")
+    parser.add_argument("--training_set_size", type=int, default=27114)
+    parser.add_argument("--validation_set_size", type=int, default=25788)
+    return parser.parse_args()
+
+
+def get_mix3_set_args():
+    parser = argparse.ArgumentParser(description="mix3_set")
+    parser.add_argument("--training_set_name", type=str, default="mix3_training")
+    parser.add_argument("--validation_set_name", type=str, default="mix3_validation")
+    parser.add_argument("--training_set_size", type=int, default=56764)
+    parser.add_argument("--validation_set_size", type=int, default=56459)
+    return parser.parse_args()
