@@ -17,7 +17,7 @@ def get_args():
     parser.add_argument("--save_path", type=str, default="./save/")
     parser.add_argument("--log_path", type=str, default="./log/")
     parser.add_argument("--training_epochs", type=int, default=100)
-    parser.add_argument("--batch_size", type=int, default=128)
+    parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--save_per_epochs", type=int, default=10)
     parser.add_argument("--validation_per_epochs", type=int, default=1)
     return parser.parse_args()
