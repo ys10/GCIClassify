@@ -60,6 +60,6 @@ def get_mix3_set_args():
     parser = argparse.ArgumentParser(description="mix3_set")
     parser.add_argument("--training_set_name", type=str, default="mix3_training")
     parser.add_argument("--validation_set_name", type=str, default="mix3_validation")
-    parser.add_argument("--training_set_size", type=int, default=56764)
-    parser.add_argument("--validation_set_size", type=int, default=56459)
+    parser.add_argument("--training_set_size", type=int, default=243455)
+    parser.add_argument("--validation_set_size", type=int, default=113693)
     return parser.parse_args()
