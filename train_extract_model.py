@@ -19,7 +19,7 @@ def get_args():
     parser.add_argument("--log_path", type=str, default="./log/")
     parser.add_argument("--training_epochs", type=int, default=100)
     parser.add_argument("--training_batch_size", type=int, default=64)
-    parser.add_argument("--validation_batch_size", type=int, default=64)
+    parser.add_argument("--validation_batch_size", type=int, default=128)
     parser.add_argument("--save_per_epochs", type=int, default=10)
     parser.add_argument("--validation_per_epochs", type=int, default=1)
     return parser.parse_args()
@@ -95,7 +95,6 @@ def main():
                 total_accuracy = 0.0
                 total_recall = 0.0
                 total_precision = 0.0
-                global_step_eval = 0
                 validation_steps = data_set_args.validation_set_size // args.validation_batch_size
                 for s in range(validation_steps):
                     tensor_dict_eval = sess.run(tensor_dict)
