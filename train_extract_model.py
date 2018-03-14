@@ -15,10 +15,10 @@ from data_set_args import get_rab_set_args, get_ked_set_args,\
 
 def get_args():
     parser = argparse.ArgumentParser(description="GlottalNet")
-    parser.add_argument("--save_path", type=str, default="./save/")
-    parser.add_argument("--log_path", type=str, default="./log/")
+    parser.add_argument("--save_path", type=str, default="./save/mix3/")
+    parser.add_argument("--log_path", type=str, default="./log/mix3/")
     parser.add_argument("--training_epochs", type=int, default=100)
-    parser.add_argument("--training_batch_size", type=int, default=64)
+    parser.add_argument("--training_batch_size", type=int, default=128)
     parser.add_argument("--validation_batch_size", type=int, default=128)
     parser.add_argument("--save_per_epochs", type=int, default=10)
     parser.add_argument("--validation_per_epochs", type=int, default=1)
@@ -28,7 +28,7 @@ def get_args():
 def main():
     tf.logging.set_verbosity(tf.logging.INFO)
     args = get_args()
-    data_set_args = get_ked_set_args()
+    data_set_args = get_mix3_set_args()
     net = ExtractModel()
     graph = tf.Graph()
     with graph.as_default():
