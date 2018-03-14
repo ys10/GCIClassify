@@ -18,7 +18,8 @@ def get_args():
     parser.add_argument("--save_path", type=str, default="./save/")
     parser.add_argument("--log_path", type=str, default="./log/")
     parser.add_argument("--training_epochs", type=int, default=100)
-    parser.add_argument("--batch_size", type=int, default=64)
+    parser.add_argument("--training_batch_size", type=int, default=64)
+    parser.add_argument("--validation_batch_size", type=int, default=1)
     parser.add_argument("--save_per_epochs", type=int, default=10)
     parser.add_argument("--validation_per_epochs", type=int, default=1)
     return parser.parse_args()
@@ -33,10 +34,10 @@ def main():
     with graph.as_default():
         with tf.variable_scope("data"):
             training_set = get_testing_set(key=data_set_args.training_set_name,
-                                           epochs=args.training_epochs, batch_size=args.batch_size)
+                                           epochs=args.training_epochs, batch_size=args.training_batch_size)
             validation_set = get_testing_set(key=data_set_args.validation_set_name,
                                              epochs=args.training_epochs // args.validation_per_epochs,
-                                             batch_size=data_set_args.validation_set_size)
+                                             batch_size=args.validation_batch_size)
             iterator = training_set.make_one_shot_iterator()
             next_element = iterator.get_next()
             training_init_op = iterator.make_initializer(training_set)
@@ -44,11 +45,24 @@ def main():
 
         with tf.variable_scope("extract_model"):
             tensor_dict = net.build(next_element, training=True)
+            """training summary"""
             loss_summary = tf.summary.scalar("loss", tensor_dict["loss"])
             accuracy_summary = tf.summary.scalar("accuracy", tensor_dict["accuracy"])
             recall_summary = tf.summary.scalar("recall", tensor_dict["recall"])
             precision_summary = tf.summary.scalar("precision", tensor_dict["precision"])
             f1_score_summary = tf.summary.scalar("f1_score", tensor_dict["f1_score"])
+            """validation summary"""
+            validation_loss = tf.placeholder(tf.float32, shape=())
+            validation_accuracy = tf.placeholder(tf.float32, shape=())
+            validation_recall = tf.placeholder(tf.float32, shape=())
+            validation_precision = tf.placeholder(tf.float32, shape=())
+            validation_f1_score = tf.placeholder(tf.float32, shape=())
+            validation_loss_summary = tf.summary.scalar("loss", validation_loss)
+            validation_accuracy_summary = tf.summary.scalar("accuracy", validation_accuracy)
+            validation_recall_summary = tf.summary.scalar("recall", validation_recall)
+            validation_precision_summary = tf.summary.scalar("precision", validation_precision)
+            validation_f1_score_summary = tf.summary.scalar("f1_score", validation_f1_score)
+            """training"""
             global_step = tf.Variable(0, dtype=tf.int32, name="global_step")
             opt = tf.train.AdamOptimizer(1e-3)
             extra_update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
@@ -67,9 +81,9 @@ def main():
         training_writer = tf.summary.FileWriter(os.path.join(args.log_path, "training"), sess.graph)
         validation_writer = tf.summary.FileWriter(os.path.join(args.log_path, "validation"), sess.graph)
         global_step_eval = sess.run(global_step)
-        training_steps = args.training_epochs * data_set_args.training_set_size // args.batch_size
-        save_steps = args.save_per_epochs * data_set_args.training_set_size // args.batch_size
-        validation_steps = args.validation_per_epochs * data_set_args.training_set_size // args.batch_size
+        training_steps = args.training_epochs * data_set_args.training_set_size // args.training_batch_size
+        save_steps = args.save_per_epochs * data_set_args.training_set_size // args.training_batch_size
+        validation_steps = args.validation_per_epochs * data_set_args.training_set_size // args.training_batch_size
         pbar = tqdm.tqdm(total=training_steps)
         pbar.update(global_step_eval)
         sess.run(training_init_op)
@@ -77,9 +91,31 @@ def main():
             """validation"""
             if global_step_eval % validation_steps == 0:
                 sess.run(validation_init_op)
-                validation_list = [loss_summary, accuracy_summary, recall_summary, precision_summary, f1_score_summary]
+                total_loss = 0.0
+                total_accuracy = 0.0
+                total_recall = 0.0
+                total_precision = 0.0
+                global_step_eval = 0
+                validation_steps = data_set_args.validation_set_size // args.validation_batch_size
+                for s in range(validation_steps):
+                    testing_list = [tensor_dict]
+                    tensor_dict_eval = sess.run(testing_list)
+                    total_loss += tensor_dict_eval["loss"]
+                    total_accuracy += tensor_dict_eval["accuracy"]
+                    total_recall += tensor_dict_eval["recall"]
+                    total_precision += tensor_dict_eval["precision"]
+                total_loss /= global_step_eval
+                total_accuracy /= global_step_eval
+                total_recall /= global_step_eval
+                total_precision /= global_step_eval
+                total_f1_score = 2 * total_recall * total_precision / (total_recall + total_precision)
+                feed_dict = {validation_loss: total_loss, validation_accuracy: total_accuracy, validation_recall: total_recall,
+                                   validation_precision: total_precision, validation_f1_score: total_f1_score}
+                validation_list = [validation_loss_summary, validation_accuracy_summary, validation_recall_summary,
+                                   validation_precision_summary, validation_f1_score_summary]
                 validation_loss_summary_eval, validation_accuracy_summary_eval, validation_recall_summary_eval,\
-                    validation_precision_summary_eval, validation_f1_score_summary_eval = sess.run(validation_list)
+                    validation_precision_summary_eval, validation_f1_score_summary_eval = sess.run(validation_list,
+                                                                                                   feed_dict=feed_dict)
                 validation_writer.add_summary(validation_loss_summary_eval, global_step=global_step_eval)
                 validation_writer.add_summary(validation_accuracy_summary_eval, global_step=global_step_eval)
                 validation_writer.add_summary(validation_recall_summary_eval, global_step=global_step_eval)
