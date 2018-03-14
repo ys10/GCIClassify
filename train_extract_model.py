@@ -19,7 +19,7 @@ def get_args():
     parser.add_argument("--log_path", type=str, default="./log/")
     parser.add_argument("--training_epochs", type=int, default=100)
     parser.add_argument("--training_batch_size", type=int, default=64)
-    parser.add_argument("--validation_batch_size", type=int, default=1)
+    parser.add_argument("--validation_batch_size", type=int, default=64)
     parser.add_argument("--save_per_epochs", type=int, default=10)
     parser.add_argument("--validation_per_epochs", type=int, default=1)
     return parser.parse_args()
@@ -98,16 +98,15 @@ def main():
                 global_step_eval = 0
                 validation_steps = data_set_args.validation_set_size // args.validation_batch_size
                 for s in range(validation_steps):
-                    testing_list = [tensor_dict]
-                    tensor_dict_eval = sess.run(testing_list)
+                    tensor_dict_eval = sess.run(tensor_dict)
                     total_loss += tensor_dict_eval["loss"]
                     total_accuracy += tensor_dict_eval["accuracy"]
                     total_recall += tensor_dict_eval["recall"]
                     total_precision += tensor_dict_eval["precision"]
-                total_loss /= global_step_eval
-                total_accuracy /= global_step_eval
-                total_recall /= global_step_eval
-                total_precision /= global_step_eval
+                total_loss /= validation_steps
+                total_accuracy /= validation_steps
+                total_recall /= validation_steps
+                total_precision /= validation_steps
                 total_f1_score = 2 * total_recall * total_precision / (total_recall + total_precision)
                 feed_dict = {validation_loss: total_loss, validation_accuracy: total_accuracy, validation_recall: total_recall,
                                    validation_precision: total_precision, validation_f1_score: total_f1_score}
