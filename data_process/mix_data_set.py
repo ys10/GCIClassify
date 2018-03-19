@@ -22,7 +22,7 @@ def copy_files(src_path, dst_path, keys, extension, rename_prefix=""):
 
 
 def main():
-    dst_path = "data/origin/cmu/mix3/"
+    dst_path = "data/origin/cmu/mix2/"
     wav_extension = ".wav"
     marks_extension = ".marks"
     """rab data set"""
@@ -49,6 +49,18 @@ def main():
                marks_extension, rename_prefix="jmk_")
     copy_files(os.path.join(jmk_path, "validation_marks"), os.path.join(dst_path, "validation_marks"),
                jmk_valid_keys, marks_extension, rename_prefix="jmk_")
+    """bdl data set"""
+    bdl_path = "data/origin/cmu/cmu_us_bdl_arctic/"
+    bdl_train_keys, _ = random_keys(os.path.join(bdl_path, "marks"), num=700)
+    bdl_valid_keys = file_names(os.path.join(bdl_path, "validation_marks"))
+    copy_files(os.path.join(bdl_path, "wav"), os.path.join(dst_path, "wav"), bdl_train_keys,
+               wav_extension, rename_prefix="bdl_")
+    copy_files(os.path.join(bdl_path, "wav"), os.path.join(dst_path, "wav"), bdl_valid_keys,
+               wav_extension, rename_prefix="bdl_")
+    copy_files(os.path.join(bdl_path, "marks"), os.path.join(dst_path, "marks"), bdl_train_keys,
+               marks_extension, rename_prefix="bdl_")
+    copy_files(os.path.join(bdl_path, "validation_marks"), os.path.join(dst_path, "validation_marks"),
+               bdl_valid_keys, marks_extension, rename_prefix="bdl_")
     """slt data set"""
     slt_path = "data/origin/cmu/cmu_us_slt_arctic/"
     slt_train_keys, _ = random_keys(os.path.join(slt_path, "marks"), num=100)

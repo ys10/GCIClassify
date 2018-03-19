@@ -68,6 +68,10 @@ def main():
     bdl_pitch_period = get_pitch_period(bdl_marks_dir, threshold=0.02)
     slt_marks_dir = "data/origin/cmu/cmu_us_slt_arctic/marks/"
     slt_pitch_period = get_pitch_period(slt_marks_dir, threshold=0.02)
+    mix2_marks_dir = "data/origin/cmu/mix2/marks/"
+    mix2_pitch_period = get_pitch_period(mix2_marks_dir, threshold=0.02)
+    mix3_marks_dir = "data/origin/cmu/mix3/marks/"
+    mix3_pitch_period = get_pitch_period(mix3_marks_dir, threshold=0.02)
     num_bins = 200
     plt.hist(rab_pitch_period, num_bins, normed=1, facecolor='green', alpha=0.5, label="rab")
     plt.hist(ked_pitch_period, num_bins, normed=1, facecolor='blue', alpha=0.5, label="ked")
@@ -76,6 +80,8 @@ def main():
     plt.hist(slt_pitch_period, num_bins, normed=1, facecolor='purple', alpha=0.5, label="slt")
     rab_pitch_period.extend(jmk_pitch_period)
     plt.hist(rab_pitch_period, num_bins, normed=1, facecolor='pink', alpha=0.5, label="rab_jmk")
+    plt.hist(mix2_pitch_period, num_bins, normed=1, facecolor='blue', alpha=0.5, label="mix2")
+    plt.hist(mix3_pitch_period, num_bins, normed=1, facecolor='green', alpha=0.5, label="mix3")
     plt.title("Pitch period distribution")
     plt.legend()
     plt.show()
