@@ -72,19 +72,6 @@ def save_marks(marks_dst_path, marks):
     pass
 
 
-def main1():
-    wav_src_dir = "data/test/wav/"
-    marks_dst_dir = "data/test/marks/"
-    keys = file_names(wav_src_dir)
-    for key in keys:
-        input_features = package_input_features(os.path.join(wav_src_dir, key+wav_extension))
-        peak_labels = list()
-        # TODO
-        marks = generate_marks(input_features["peak_indices"], peak_labels, input_features["rate"])
-        save_marks(os.path.join(marks_dst_dir, key+marks_extension), marks)
-    pass
-
-
 def main():
     tf.logging.set_verbosity(tf.logging.INFO)
     args = get_args()
