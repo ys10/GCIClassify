@@ -83,6 +83,7 @@ def evaluate(est_path, ref_path, radius=0.0007):
 
 
 def main():
+    false_missed_count = 7901
     est_dir = "data/test/marks/"
     ref_dir = "data/origin/cmu/cmu_us_bdl_arctic/marks/"
     marks_extension = ".marks"
@@ -101,6 +102,10 @@ def main():
         missed_count += result_dict["missed_count"]
         false_count += result_dict["false_count"]
         errors.extend(result_dict["errors"])
+    """revise false missed marks"""
+    total_count -= false_missed_count
+    missed_count -= false_missed_count
+    """calculate rate"""
     correct_rate = correct_count / total_count
     missed_rate = missed_count / total_count
     false_rate = false_count / total_count
