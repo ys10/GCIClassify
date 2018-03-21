@@ -63,6 +63,7 @@ def main(key, data_set_path):
                                                                int(peak_mark_threshold * rate))
     positive_label_indices = [peak_indices[i] for i in [idx for idx, label in enumerate(labels) if label == 1]]
     negative_label_indices = [peak_indices[i] for i in [idx for idx, label in enumerate(labels) if label == 0]]
+    print("missed: {}".format(len(missed_mark_indices)))
     print("positive_label_count: {}".format(len(positive_label_indices)))
     print("negative_label_count: {}".format(len(negative_label_indices)))
 
@@ -80,5 +81,5 @@ if __name__ == "__main__":
     # _key = "edx_1384"
     # _data_set_path = "data/origin/cmu/cstr_uk_rab_diphone/"
     _key = "arctic_a0001"
-    _data_set_path = "data/origin/cmu/cmu_us_jmk_arctic/"
+    _data_set_path = "data/origin/cmu/cmu_us_bdl_arctic/"
     main(_key, _data_set_path)
