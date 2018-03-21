@@ -127,3 +127,28 @@ def metrics(logits, labels):
     f1_score = tf.divide(2 * tf.multiply(rec_op, pre_op), tf.add(rec_op, pre_op))
     return {"logits": logits, "predictions": predictions, "labels": labels, "loss": loss,
             "accuracy": acc_op, "recall": rec_op, "precision": pre_op, "f1_score": f1_score}
+
+
+class GenerateModel(object):
+    def __init__(self, name="ExtractionModel", extract_size=256, label_classes=2):
+        self.name = name
+        self.extract_size = extract_size
+        self.label_classes = label_classes
+
+    def build(self, data, reuse=None, training=False):
+        with tf.variable_scope(self.name, reuse=reuse):
+            wav = tf.cast(data, tf.float32)
+            # wav = data["wav"]
+            mu_wav = mu_law(wav)
+            mu_wav = tf.expand_dims(mu_wav, axis=-1)  # expand channel dimension
+            cnn_output = cnn(mu_wav, extract_size=self.extract_size, reuse=reuse, training=training)
+            cnn_output = tf.squeeze(cnn_output, axis=1)  # squeeze time step dimension
+            tf.logging.info("cnn output shape: " + str(cnn_output.get_shape()))
+            # rnn_output = bi_rnn(cnn_output, extract_size=self.extract_size, reuse=reuse)
+            # tf.logging.info("rnn output shape: " + str(rnn_output.get_shape()))
+            dense_output = dense(cnn_output, reuse=reuse, training=training)
+            tf.logging.info("dense output shape: " + str(dense_output.get_shape()))
+            logits = tf.layers.dense(inputs=dense_output, units=self.label_classes, name="output_layer")
+            # logits = tf.squeeze(logits, axis=1)  # squeeze time step dimension
+            predictions = tf.argmax(logits, axis=-1)
+            return {"predictions": predictions}
