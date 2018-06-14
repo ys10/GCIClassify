@@ -22,6 +22,8 @@ def show_wav_info(rate, raw_wav, raw_egg, filtered_wav, mark_indices, missed_mar
     #             color='red', label="positive_label")
     # ax1.scatter([i / rate for i in negative_label_indices], filtered_wav[negative_label_indices],
     #             color='black', label="negative_label")
+    plt.xticks(fontsize=18)
+    plt.yticks(fontsize=20)
 
     """draw filtered wav signal"""
     ax2 = plt.subplot(3, 1, 2, sharex=ax1)
@@ -36,6 +38,8 @@ def show_wav_info(rate, raw_wav, raw_egg, filtered_wav, mark_indices, missed_mar
     #             color='red', label="positive_label")
     # ax2.scatter([i / rate for i in negative_label_indices], filtered_wav[negative_label_indices],
     #             color='black', label="negative_label")
+    plt.xticks(fontsize=18)
+    plt.yticks(fontsize=20)
 
     """draw egg signal"""
     ax3 = plt.subplot(3, 1, 3, sharex=ax1)
@@ -50,13 +54,15 @@ def show_wav_info(rate, raw_wav, raw_egg, filtered_wav, mark_indices, missed_mar
     #             filtered_wav[positive_label_indices], color='red', label="positive_label")
     # ax3.scatter([i / rate for i in negative_label_indices],
     #             filtered_wav[negative_label_indices], color='black', label="negative_label")
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
 
     """pic"""
-    plt.xlabel('Time [sec]')
+    plt.xlabel('Time [sec]', fontsize=20)
     # plt.legend([wav_line, filtered_wav_line, egg_line],
     #            ["raw wav", "filtered wav", "raw egg"], loc=4)
     plt.grid()
-    plt.subplots_adjust(bottom=0.07, left=0.05, right=0.99, top=0.96, wspace=0.20, hspace=0.17)
+    plt.subplots_adjust(bottom=0.10, left=0.10, right=0.99, top=0.97, wspace=0.20, hspace=0.05)
     plt.show()
 
 

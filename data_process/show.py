@@ -10,20 +10,28 @@ def show_wav_info(rate, raw_wav, filtered_wav, mark_indices, missed_mark_indices
                   positive_label_indices, negative_label_indices):
     plt.subplot(1, 1, 1)
     time = np.arange(0, len(raw_wav))*(1.0 / rate)  # time.
-    plt.plot(time, raw_wav, 'b-', label='raw_wav')  # draw raw wave data.
-    plt.plot(time, filtered_wav, 'g-', linewidth=2, label='filtered_wav')  # draw filtered wave data.
-    for mark_idx in list(set(mark_indices) - set(missed_mark_indices)):
-        plt.axvline(mark_idx / rate, color='yellow', linestyle="--")  # draw identified mark locations
-    for mark_idx in missed_mark_indices:
-        plt.axvline(mark_idx / rate, color='purple', linestyle="--")  # draw missed mark locations
+    # plt.plot(time, raw_wav, 'b-', label='raw_wav')  # draw raw wave data.
+    # plt.plot(time, filtered_wav, 'g-', linewidth=1.7, label='filtered_wav')  # draw filtered wave data.
+    plt.plot(time, raw_wav, '--', label='raw_wav', color='gray')  # draw raw wave data.
+    plt.plot(time, filtered_wav, '-', linewidth=1.7, label='filtered_wav', color='blue')  # draw filtered wave data.
+    # for mark_idx in list(set(mark_indices) - set(missed_mark_indices)):
+    #     plt.axvline(mark_idx / rate, color='yellow', linestyle="--")  # draw identified mark locations
+    # for mark_idx in missed_mark_indices:
+    #     plt.axvline(mark_idx / rate, color='purple', linestyle="--")  # draw missed mark locations
+    # plt.scatter([i / rate for i in positive_label_indices], filtered_wav[positive_label_indices],
+    #             color='red', label="positive_label")
+    # plt.scatter([i / rate for i in negative_label_indices], filtered_wav[negative_label_indices],
+    #             color='black', label="negative_label")
     plt.scatter([i / rate for i in positive_label_indices], filtered_wav[positive_label_indices],
-                color='red', label="positive_label")
+                s=200, edgecolors='black', color='black', label="positive_label")
     plt.scatter([i / rate for i in negative_label_indices], filtered_wav[negative_label_indices],
-                color='black', label="negative_label")
-    plt.xlabel('Time [sec]')
+                s=200, edgecolors='black', color='white', label="negative_label")
+    plt.xlabel('Time [sec]', fontsize=20)
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
     plt.grid()
     plt.legend()
-    plt.subplots_adjust(hspace=0.35)
+    plt.subplots_adjust(bottom=0.12, left=0.10, right=0.99, top=0.99, wspace=0.20, hspace=0.17)
     plt.show()
 
 
@@ -81,5 +89,5 @@ if __name__ == "__main__":
     # _key = "edx_1384"
     # _data_set_path = "data/origin/cmu/cstr_uk_rab_diphone/"
     _key = "arctic_a0001"
-    _data_set_path = "data/origin/cmu/cmu_us_bdl_arctic/"
+    _data_set_path = "data/origin/cmu/cmu_us_jmk_arctic/"
     main(_key, _data_set_path)
