@@ -69,6 +69,25 @@ def cnn(inputs, extract_size, reuse=None, training=False):
     return output
 
 
+def dcnn(inputs, extract_size, reuse=None, training=False):
+    with tf.variable_scope("cnn", reuse=reuse):
+        """extract feature from raw wave."""
+        output = inputs
+        for i in range(1, 3):
+            output = tf.layers.conv1d(output, filters=2**(i+3), kernel_size=3, strides=3**(i-1), padding='same',
+                                      dilation=3**(i-1), activation=tf.nn.relu, name="conv_layer_"+str(i))
+            output = tf.layers.batch_normalization(output, training=training, name="bn_layer_"+str(i))
+        for i in range(3, 5):
+            output = tf.layers.conv1d(output, filters=extract_size, kernel_size=3, strides=3**(i-1), padding='same',
+                                      dilation=3**(i-1), activation=tf.nn.relu, name="conv_layer_" + str(i))
+            output = tf.layers.batch_normalization(output, training=training, name="bn_layer_" + str(i))
+        output = tf.layers.conv1d(output, filters=extract_size, kernel_size=3, strides=3**(5-1), padding='valid',
+                                  dilation=3**(5-1), activation=tf.nn.relu, name="conv_layer_5")
+        output = tf.layers.batch_normalization(output, training=training, name="bn_layer_5")
+        # TODO extract feature from raw wave.
+    return output
+
+
 def bi_rnn(inputs, extract_size, reuse=None):
     with tf.variable_scope("rnn", reuse=reuse):
         """express output of CNN on time step dimension."""
